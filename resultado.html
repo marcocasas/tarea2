@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Recorrido Mexico</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js" type="text/javascript"></script>
+  <script src="https://unpkg.com/mappa-mundi/dist/mappa.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+	<script>
+		var txtFile = new XMLHttpRequest();
+		txtFile.open("GET", "camino.txt", true);
+		txtFile.onreadystatechange = function() {
+		  if (txtFile.readyState === 4 && txtFile.status == 200) {
+		     allText = txtFile.responseText;
+		  }
+		document.getElementById('road').innerHTML = allText;
+	</script>
+	<div id="road">
+		El camino para realizar el recorrido es:
+	</div>
+	<div>
+		<embed src="camino.txt">
+	</div>
+	<script>
+	var myMap;
+	var canvas;
+	var mappa = new Mappa('Leaflet');
+
+	var options = {
+	  lat: 23,
+	  lng: -102,
+	  zoom: 5,
+	  style: "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+	}
+
+	// p5.js setup
+	function setup(){
+	  canvas = createCanvas(800,520); 
+	  myMap = mappa.tileMap(options); 
+	  myMap.overlay(canvas);
+	  fill(200, 100, 100);
+	}
+
+	// p5.js draw
+	function draw(){
+		clear();
+	 	var origen = myMap.latLngToPixel(19.43,-99.13); 
+		ellipse(origen.x, origen.y, 10, 10);
+		var destino = myMap.latLngToPixel(18.93, -99.06);
+		ellipse(destino.x, destino.y, 10, 10);
+	}
+	</script>
+</body>
+
+</html>
