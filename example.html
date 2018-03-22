@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Recorrido México</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js" type="text/javascript"></script>
+  <script src="https://unpkg.com/mappa-mundi/dist/mappa.min.js" type="text/javascript"></script>
+  <!-- Para poder usar DropDownList -->
+  <script src="p5.dom.min.js"></script>
+</head>
+
+<body>
+  	<script>
+	  	// Create a variable to hold our map
+		var myMap;
+		// Create a variable to hold our canvas
+		var canvas;
+		// Create a new Mappa instance using Leaflet.
+		var mappa = new Mappa('Leaflet');
+
+		// Opciones para despleegar mapa de Mexico
+		var options = {
+		  lat: 23,
+		  lng: -102,
+		  zoom: 5,
+		  style: "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+		}
+
+		//Creacion de variables para usar DropDownList
+		var origen;
+		var destino;
+
+		// p5.js setup
+		function setup(){
+			// Create a canvas 800x620
+			canvas = createCanvas(800,620); 
+			// Add a grey background
+			background(100);
+
+		    // Create a tile map with lat 23, lng -102, zoom 5
+  			myMap = mappa.tileMap(options); 
+  			// Overlay the tilemap on top of the canvas
+  			myMap.overlay(canvas);
+
+  			origen = createSelect();
+			origen.position(10,10);
+			origen.option('CDMX');
+			origen.option('GUADALAJARA');
+			origen.option('MORELOS');
+			origen.changed(mySelectEvent);
+			origen.overlay(canvas);
+		}
+
+		// p5.js draw
+		function draw(){
+
+		}
+
+		function mySelectEvent() {
+			var item = origen.value();
+		 	background(200);
+			text('it is a' + item + '!', 50, 50);
+		}
+	</script>
+</body>
+
+</html>
