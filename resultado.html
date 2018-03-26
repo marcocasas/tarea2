@@ -1,57 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+  <head>
+    <title>Resultado del recorrido</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+  	<h3>Recorrido México</h3>
+  	<input type="hidden" id="demo">
+   	<input type="hidden" id="demo2">
+  	<input type="button" id="master" value="Muestra el recorrido"  onclick="loadPinOrigen(); loadPinDestino(); loadXMLDoc();">
+  	<input type="button" id="submit" value="Muestra pines">
+  	<input type="button" value="Regresar a página principal" onclick="location.href = 'http://localhost/tarea2/mapa.html';">
+    <div id="map"></div>
+    <script>
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 5,
+          center: {lat: 22.5, lng: -102}
+        });
+        var geocoder = new google.maps.Geocoder();
 
-<head>
-  <title>Recorrido Mexico</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js" type="text/javascript"></script>
-  <script src="https://unpkg.com/mappa-mundi/dist/mappa.min.js" type="text/javascript"></script>
-</head>
+        document.getElementById('submit').addEventListener('click', function() {
+          geocodeAddress1(geocoder, map);
+          geocodeAddress2(geocoder, map);
+        });
 
-<body>
-	<script>
-		var txtFile = new XMLHttpRequest();
-		txtFile.open("GET", "camino.txt", true);
-		txtFile.onreadystatechange = function() {
-		  if (txtFile.readyState === 4 && txtFile.status == 200) {
-		     allText = txtFile.responseText;
-		  }
-		document.getElementById('road').innerHTML = allText;
-	</script>
-	<div id="road">
-		El camino para realizar el recorrido es:
-	</div>
-	<div>
-		<embed src="camino.txt">
-	</div>
-	<script>
-	var myMap;
-	var canvas;
-	var mappa = new Mappa('Leaflet');
+        document.getElementById('submit2').addEventListener('click', function() {
+          geocodeAddress2(geocoder, map);
+        });
 
-	var options = {
-	  lat: 23,
-	  lng: -102,
-	  zoom: 5,
-	  style: "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-	}
+        document.getElementById('master').addEventListener('click', function() {
+          geocodeAddress1(geocoder, map);
+          geocodeAddress2(geocoder, map);
+        });
+      }
 
-	// p5.js setup
-	function setup(){
-	  canvas = createCanvas(800,520);
-	  myMap = mappa.tileMap(options);
-	  myMap.overlay(canvas);
-	  fill(200, 100, 100);
-	}
+      function geocodeAddress1(geocoder, resultsMap) {
+        var address = document.getElementById('demo').value;
+        geocoder.geocode({'address': address}, function(results, status) {
+          if (status === 'OK') {
+            resultsMap.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+              map: resultsMap,
+              position: results[0].geometry.location
+            });
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+      }
 
-	// p5.js draw
-	function draw(){
-		clear();
-	 	var origen = myMap.latLngToPixel(19.43,-99.13);
-		ellipse(origen.x, origen.y, 10, 10);
-		var destino = myMap.latLngToPixel(18.93, -99.06);
-		ellipse(destino.x, destino.y, 10, 10);
-	}
-	</script>
-</body>
+      function geocodeAddress2(geocoder, resultsMap) {
+        var address = document.getElementById('demo2').value;
+        geocoder.geocode({'address': address}, function(results, status) {
+          if (status === 'OK') {
+            resultsMap.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+              map: resultsMap,
+              position: results[0].geometry.location
+            });
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+      }
+    </script>
+ 	<script type="text/javascript">
+  		function loadXMLDoc() {
+  		  	var xhttp = new XMLHttpRequest();
+			xhttp.open("GET", "camino.txt", false);
+			xhttp.setRequestHeader("Cache-Control", "max-age=0");
+  		  	xhttp.onreadystatechange = function() {
+  		    	if (this.readyState == 4) {
+            		if (this.status == 200 || this.status == 0) {
+  		        		var textResponse = this.responseText;
+              			alert(this.responseText);
+            		}
+  		    	}
+  		  	}
+  		  	xhttp.send(null);
+        	document.getElementById("demo").innerHTML = "El recorrido es: " + textResponse;
+  		}
 
+  		function loadPinOrigen() {
+  			var xhttp = new XMLHttpRequest();
+			xhttp.open("GET", "origen.txt", false);
+			xhttp.setRequestHeader("Cache-Control", "max-age=0");
+  		  	xhttp.onreadystatechange = function() {
+  		    	if (this.readyState == 4) {
+            		if (this.status == 200 || this.status == 0) {
+  		        		var textResponse = this.responseText;
+  		        		document.getElementById("demo").value = textResponse;
+            		}
+  		    	}
+  		  	}
+  		  	xhttp.send();
+  		}
+
+  		function loadPinDestino() {
+  			var xhttp = new XMLHttpRequest();
+			xhttp.open("GET", "destino.txt", false);
+			xhttp.setRequestHeader("Cache-Control", "max-age=0");
+  		  	xhttp.onreadystatechange = function() {
+  		    	if (this.readyState == 4) {
+            		if (this.status == 200 || this.status == 0) {
+  		        		var textResponse = this.responseText;
+  		        		document.getElementById("demo2").value = textResponse;
+            		}
+  		    	}
+  		  	}
+  		  	xhttp.send();
+  		}
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB87hftZ7UDBcOyEDI-wI4U-F3_onQojIA&callback=initMap">
+    </script>
+  </body>
 </html>

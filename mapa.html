@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Recorrido Mexico</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+  	<h3>Recorrido México</h3>
+  	<form action="launchcmd.php" method="post">
+  		<input type="submit" value="Calcular Ruta">
+    </form>
+    <div id="floating-panel">
+      <form action="insertinput.php" method="post">
+        <input type="submit" value="Insertar ciudades">
+        <input name="origen" id="origen" type="textbox" placeholder="Inserta ciudad de origen">
+        <input name="destino" id="destino" type="textbox" placeholder="Inserta ciudad de destino">
+  	  </form>
+    </div>
+    <div id="map"></div>
+    <script>
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 5,
+          center: {lat: 22.5, lng: -102}
+        });
+        var geocoder = new google.maps.Geocoder();
+
+        document.getElementById('submit').addEventListener('click', function() {
+          geocodeAddress1(geocoder, map);
+        });
+
+        document.getElementById('submit2').addEventListener('click', function() {
+          geocodeAddress2(geocoder, map);
+        });
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB87hftZ7UDBcOyEDI-wI4U-F3_onQojIA&callback=initMap">
+    </script>
+  </body>
+</html>

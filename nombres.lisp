@@ -1,9 +1,5 @@
-; (setq hijos '((CDMX (-2 2)(Puebla 10 Hidalgo 8))(Guadalajara (-2 9) (Morelos 5 Puebla 2))
-; (Puebla (-3 5) (CDMX 10 Guadalajara 2))(Morelos (-3 6) (Guadalajara 5 Hidalgo 7)) 
-; (Hidalgo (-3 4) (Morelos 7 CDMX 8))))
-
-(setq hijos '((TIJUANA (32.52 -117.03)(LAPAZ 1471.65 CHIHUAHUA 1471.65 CULIACAN 1577.91 HERMOSILLO 874.66 ENSENADA 105))
-(CDMX (19.43 -99.13)(EDOMEX 95.06 PACHUCA 91.17 TOLUCA 65.95 CUERNAVACA 92.26 PUEBLA 134.53 QUERETARO 217.36 ECATEPEC 25 ZARAGOZA 131.49))
+(setq nonbres '((TIJUANA 'Tijuana))
+(CDMX 'Ciudad-de-Mexico)
 (TUXPAN (19.55 -103.37)(XALAPA 316.97 ORIZABA 421.52 VERACRUZ 217.36 XICO 334.91 TAMIAHUA 41.4 CUERNAVACA 92.26))
 (MERIDA (20.96 -89.62)(CAMPECHE 176.16 CHETUMAL 383.27 CANCUN 303.22 CIUDADDELCARMEN 382.94))
 (LAPAZ (24.14 -110.32)(TIJUANA 1471.65 ENSENADA 1370.61))
@@ -33,7 +29,7 @@
 (HERMOSILLO (29.08 -110.96)(TIJUANA 874.66 CHIHUAHUA 689.22 CIUDADJUAREZ 749.09 CIUDADOBREGON 251.98 LOSMOCHIS 486.96 MAZATLAN 888.26 NAVOJOA 324.06))
 (VILLAHERMOSA (17.99 -92.91)(CAMPECHE 381.88 TUXTLAGUTIERREZ 246.97 CHETUMAL 551 CIUDADDELCARMEN 215.5 PARAISO 74.24))
 (CIUDADVICTORIA (23.74 -99.14)(SALTILLO 366.36 MONTERREY 284.91 REYNOSA 326.33 APODACA 300.62 SANLUISPOTOSI 332.11))
-(TLAXCALA (19.31 -98.23)(CUERNAVACA 190.14 PUEBLA 47.1 XALAPA 176.16 TEHUACAN 164.82 ITAM 129.47))
+(TLAXCALA (19.31 -98.23)(CUERNAVACA 194.8 PUEBLA 47.1 XALAPA 176.16 TEHUACAN 164.82 ITAM 129.47))
 (XALAPA (19.52 -96.92)(TUXPAN 316.97 PUEBLA 173 ZARAGOZA 135 ORIZABA 143 TEHUACAN 217))
 (ZACATECAS (22.67 -102.57)(AGUASCALIENTES 118.17 DURANGO 288.93 GUANAJUATO 296.64 GUADALAJARA 341.28 GUADALUPE 9.19))
 (ECATEPEC (20.20 -96.93)(CDMX 25 TOLUCA 86 PACHUCA 71 CUERNAVACA 98 PUEBLA 145))
@@ -78,76 +74,3 @@
 (PARAISO (18.39 -93.21) (VILLAHERMOSA 74.24))
 (ITAM (19.34 -99.19) (TLAXCALA 129.47))
 (TAPACHULA (14.90 -92.26) (TONALA 224.29 TUXTLAGUTIERREZ 371.62))))
-
-(setq cerrado '())
-(setq abierto '())
-(setq respuesta '())
-(setq ciudadesEntrada '())
-
-(defun obtenHijos(nombre lista)
-	(cond
-		((null lista) nil)
-		((eql (caar lista) nombre) (remove nil (mapcar (lambda (x) (if (symbolp x) x)) (car (last (car lista))))))
-		(t (obtenHijos nombre (cdr lista)))
-	)
-)
-
-(defun longitudCamino(padre hijo lista)
-	(cond
-		((null lista) nil)
-		((eql (caar lista) padre) (let ((aux (car (last (car lista)))))
-										(loop
-											(when (or (null aux) (eql (car aux) hijo)) (return (cadr aux)))
-											(setq aux (cddr aux))
-										)
-									)
-		)
-		(t (longitudCamino padre hijo (cdr lista)))
-	)
-)
-
-
-(defun distLinRec(ciudad1 ciudad2)
-	(setq pto1 (car (remove nil (mapcar (lambda (x) (if (eql ciudad1 (car x)) (second x))) hijos))))
-	(setq pto2 (car (remove nil (mapcar (lambda (x) (if (eql ciudad2 (car x)) (second x))) hijos))))
-	(sqrt (+ (expt (- (first pto1) (first pto2)) 2) (expt (- (second pto1) (second pto2)) 2)))
-)
-
-(defun regresaSolucion(lista padre)
-	(cond 
-		((null lista) respuesta)
-		((eql padre (caar lista)) (push padre respuesta) (regresaSolucion (cdr lista) (cadar lista)))
-		(t (regresaSolucion (cdr lista) padre))
-	)
-)
-
-(defun rbfs(destino actual flimite)
-	(setq destino destino)
-	(cond 
-		((eql destino (car actual)) (regresaSolucion cerrado destino))
-		(t 	
-			(if (eql destino (car actual)) (regresaSolucion cerrado destino))
-			(setq abierto (append (mapcar (lambda (x) (list x (car actual) (+ (distLinRec x (car actual)) (+ (longitudCamino (car actual) x hijos) (third actual))))) (obtenHijos(car actual) hijos)) abierto))
-			(setq abierto (set-difference abierto cerrado :key 'car))
-			(setq abierto (sort (copy-seq abierto) #'< :key #'third))
-			(setq best (pop abierto))
-			(push best cerrado)
-			(rbfs destino best flimite))
-	)
-)
-
-(defun aestrella(destino actual)
-	(push (append (list actual) '( sin-padre 0)) cerrado)
-	(rbfs destino (car cerrado) 999)
-)
-
-(let ((in (open "entrada.txt" :if-does-not-exist nil)))
-	(when in
-		(loop for line = (read-line in nil)
-			while line do (push (intern line) ciudadesEntrada)
-		)
-		(close in)
-	)
-)
-
-(print (aestrella (first ciudadesEntrada) (second ciudadesEntrada)))
